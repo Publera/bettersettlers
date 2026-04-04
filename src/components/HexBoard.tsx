@@ -8,10 +8,15 @@ import {
 import type { BoardState } from '../lib/board-generator';
 
 // ── Hex geometry ──────────────────────────────────────────
-// Flat-top regular hexagons that tessellate with zero gaps.
-// HEX_SIZE = distance from center to any vertex.
+// Pointy-top regular hexagons that tessellate with zero gaps (Catan standard).
+// HEX_SIZE = distance from center to any vertex (circumradius).
 const HEX_SIZE = 40;
-const HEX_H = Math.sqrt(3) * HEX_SIZE; // full height (flat edge to flat edge)
+// Grid-to-pixel mapping derived from coordinate analysis:
+//   Same-row neighbors differ by dx=2, diagonal neighbors by dx=1,dy=1.
+//   All adjacent hex centers must be exactly sqrt(3)*HEX_SIZE apart.
+//   Solving: 1 grid-x unit = sqrt(3)/2 * HEX_SIZE, 1 grid-y unit = 1.5 * HEX_SIZE.
+const GRID_X_SCALE = (Math.sqrt(3) / 2) * HEX_SIZE;  // ~34.64
+const GRID_Y_SCALE = 1.5 * HEX_SIZE;                  // 60
 
 interface HexBoardProps {
   board: BoardState;
@@ -93,34 +98,26 @@ const HARBOR_DOT_COLOR: Record<string, string> = {
 
 // ── Geometry helpers ──────────────────────────────────────
 
-// Convert the game's offset-grid coordinates to pixel positions.
-// The grid uses even-q offset layout:
-//   • columns step by x (2 = one hex apart)
-//   • odd rows are shifted right by 1 unit in x
-// For flat-top hexes the repeat distances are:
-//   horiz: 1.5 × size   (3/4 of HEX_W)
-//   vert:  √3 × size     (HEX_H)
-// Each grid-x step of 1 equals half a hex column, so multiply by 0.75×size.
-// Each grid-y step of 1 equals one full hex row, so multiply by HEX_H.
 function gridToPixel(gridX: number, gridY: number): { px: number; py: number } {
-  const px = gridX * (HEX_SIZE * 0.75);       // 0.75 * size per grid unit
-  const py = gridY * (HEX_H * 0.5);           // half-height per grid unit
-  return { px, py };
+  return {
+    px: gridX * GRID_X_SCALE,
+    py: gridY * GRID_Y_SCALE,
+  };
 }
 
+// Pointy-top hex: first vertex points UP (angle -90° = -π/2).
 function hexPoints(cx: number, cy: number, size: number): string {
   const points: string[] = [];
   for (let i = 0; i < 6; i++) {
-    const angle = (Math.PI / 180) * (60 * i);
-    const x = cx + size * Math.cos(angle);
-    const y = cy + size * Math.sin(angle);
-    points.push(`${x},${y}`);
+    const angle = (Math.PI / 3) * i - Math.PI / 2;
+    points.push(`${cx + size * Math.cos(angle)},${cy + size * Math.sin(angle)}`);
   }
   return points.join(' ');
 }
 
+// Vertex positions for pointy-top hex (matching hexPoints rotation).
 function hexVertex(cx: number, cy: number, size: number, vertex: number): { x: number; y: number } {
-  const angle = (Math.PI / 180) * (60 * vertex);
+  const angle = (Math.PI / 3) * vertex - Math.PI / 2;
   return {
     x: cx + size * Math.cos(angle),
     y: cy + size * Math.sin(angle),
@@ -371,19 +368,19 @@ export default function HexBoard({ board, className, animationKey }: HexBoardPro
     for (let i = 0; i < board.landGrid.length; i++) {
       const { px, py } = gridToPixel(board.landGrid[i].x, board.landGrid[i].y);
       landPixels.push({ px, py, idx: i });
-      minX = Math.min(minX, px - HEX_SIZE);
-      minY = Math.min(minY, py - HEX_H / 2);
-      maxX = Math.max(maxX, px + HEX_SIZE);
-      maxY = Math.max(maxY, py + HEX_H / 2);
+      minX = Math.min(minX, px - GRID_X_SCALE);
+      minY = Math.min(minY, py - HEX_SIZE);
+      maxX = Math.max(maxX, px + GRID_X_SCALE);
+      maxY = Math.max(maxY, py + HEX_SIZE);
     }
 
     for (let i = 0; i < board.waterGrid.length; i++) {
       const { px, py } = gridToPixel(board.waterGrid[i].x, board.waterGrid[i].y);
       waterPixels.push({ px, py, idx: i });
-      minX = Math.min(minX, px - HEX_SIZE);
-      minY = Math.min(minY, py - HEX_H / 2);
-      maxX = Math.max(maxX, px + HEX_SIZE);
-      maxY = Math.max(maxY, py + HEX_H / 2);
+      minX = Math.min(minX, px - GRID_X_SCALE);
+      minY = Math.min(minY, py - HEX_SIZE);
+      maxX = Math.max(maxX, px + GRID_X_SCALE);
+      maxY = Math.max(maxY, py + HEX_SIZE);
     }
 
     const padding = 12;
