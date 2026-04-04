@@ -152,23 +152,21 @@ function App() {
         style={{ borderBottom: '1px solid var(--color-border-light)' }}
       >
         <div className="flex items-center gap-2.5">
-          {/* Logo hexagon */}
+          {/* Logo: hex tile with settlement */}
           <svg width="28" height="28" viewBox="0 0 100 100" aria-hidden="true">
-            <polygon
-              points="50,3 93,27 93,73 50,97 7,73 7,27"
-              fill="var(--color-brand)"
-            />
-            <text
-              x="50"
-              y="56"
-              textAnchor="middle"
-              fontSize="30"
-              fontWeight="700"
-              fill="#f5f0e8"
-              fontFamily="system-ui, sans-serif"
-            >
-              ES
-            </text>
+            <defs>
+              <linearGradient id="logo-hex-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#4a9e4e"/>
+                <stop offset="100%" stopColor="#2d6a2e"/>
+              </linearGradient>
+            </defs>
+            <polygon points="50,3 93,27 93,73 50,97 7,73 7,27" fill="url(#logo-hex-bg)"/>
+            <polygon points="50,8 88,29 88,71 50,92 12,71 12,29" fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="1.5"/>
+            <polygon points="50,22 72,38 72,62 28,62 28,38" fill="#3b7dd8" stroke="#2a5ca0" strokeWidth="1.5" strokeLinejoin="round"/>
+            <polygon points="50,22 72,38 28,38" fill="#c0392b" stroke="#962d22" strokeWidth="1" strokeLinejoin="round"/>
+            <rect x="44" y="48" width="12" height="14" rx="1" fill="#1a3a6b"/>
+            <rect x="56" y="43" width="9" height="9" rx="1" fill="#7ab3e8" stroke="#2a5ca0" strokeWidth="0.8"/>
+            <rect x="35" y="43" width="9" height="9" rx="1" fill="#7ab3e8" stroke="#2a5ca0" strokeWidth="0.8"/>
           </svg>
           <div>
             <h1
