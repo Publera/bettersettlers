@@ -5,26 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
     <!-- Primary Meta -->
-    <title>EvenBetterSettlers — Fair Catan Board Generator</title>
+    <title>BetterSettlers — Fair Catan Board Generator</title>
     <meta name="description" content="Generate balanced Settlers of Catan board layouts for fairer, more competitive games. No resource clustering, balanced probability distribution, and fair harbor placement." />
     <meta name="keywords" content="Catan, Settlers of Catan, board generator, balanced board, fair distribution, board game tool" />
-    <meta name="author" content="EvenBetterSettlers" />
+    <meta name="author" content="BetterSettlers" />
 
     <!-- Canonical -->
-    <link rel="canonical" href="https://evenbettersettlers.com/" />
+    <link rel="canonical" href="https://bettersettlers.com/" />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://evenbettersettlers.com/" />
-    <meta property="og:title" content="EvenBetterSettlers — Fair Catan Board Generator" />
+    <meta property="og:url" content="https://bettersettlers.com/" />
+    <meta property="og:title" content="BetterSettlers — Fair Catan Board Generator" />
     <meta property="og:description" content="Generate balanced Settlers of Catan board layouts for fairer, more competitive games." />
-    <meta property="og:site_name" content="EvenBetterSettlers" />
+    <meta property="og:site_name" content="BetterSettlers" />
     <meta property="og:locale" content="en_US" />
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content="EvenBetterSettlers — Fair Catan Board Generator" />
+    <meta name="twitter:title" content="BetterSettlers — Fair Catan Board Generator" />
     <meta name="twitter:description" content="Generate balanced Settlers of Catan board layouts for fairer, more competitive games." />
+
+    <!-- Domain-aware meta override for EvenBetterSettlers -->
+    <script>
+      if (location.hostname.includes('evenbetter')) {
+        document.title = 'EvenBetterSettlers \u2014 Fair Catan Board Generator';
+        var m = { 'og:title': 'EvenBetterSettlers \u2014 Fair Catan Board Generator', 'og:url': 'https://evenbettersettlers.com/', 'og:site_name': 'EvenBetterSettlers', 'twitter:title': 'EvenBetterSettlers \u2014 Fair Catan Board Generator' };
+        for (var k in m) { var el = document.querySelector('meta[property="'+k+'"],meta[name="'+k+'"]'); if (el) el.setAttribute('content', m[k]); }
+        var c = document.querySelector('link[rel=canonical]'); if (c) c.setAttribute('href', 'https://evenbettersettlers.com/');
+      }
+    </script>
 
     <!-- Google Search Console -->
 
@@ -33,7 +43,7 @@
     <meta name="theme-color" content="#1a1f16" media="(prefers-color-scheme: dark)" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="EvenBetter" />
+    <meta name="apple-mobile-web-app-title" content="Better" />
     <meta name="mobile-web-app-capable" content="yes" />
     <link rel="manifest" href="./manifest.json" />
 
@@ -53,8 +63,8 @@
     {
       "@context": "https://schema.org",
       "@type": "WebApplication",
-      "name": "EvenBetterSettlers",
-      "url": "https://evenbettersettlers.com",
+      "name": "BetterSettlers",
+      "url": "https://bettersettlers.com",
       "description": "Generate balanced Settlers of Catan board layouts for fairer, more competitive games.",
       "applicationCategory": "GameApplication",
       "operatingSystem": "Any",
@@ -65,7 +75,7 @@
       },
       "creator": {
         "@type": "Organization",
-        "name": "EvenBetterSettlers"
+        "name": "BetterSettlers"
       }
     }
     </script>

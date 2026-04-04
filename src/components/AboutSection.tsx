@@ -28,7 +28,7 @@ export default function AboutSection({ onClose }: { onClose: () => void }) {
         </div>
 
         <p className="mb-3">
-          EvenBetterSettlers generates balanced Settlers of Catan board layouts so gameplay
+          This tool generates balanced Settlers of Catan board layouts so gameplay
           is fairer and more competitive. The algorithm ensures no resource clustering,
           balanced probability distribution, and fair harbor placement.
         </p>

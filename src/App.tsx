@@ -12,6 +12,12 @@ import Controls from './components/Controls';
 
 const AboutSection = lazy(() => import('./components/AboutSection'));
 
+// ── Site branding (auto-detect domain) ────────────────────
+const isEvenBetter = typeof window !== 'undefined' && window.location.hostname.includes('evenbetter');
+const SITE_NAME = isEvenBetter ? 'EvenBetterSettlers' : 'BetterSettlers';
+const SITE_SHORT = isEvenBetter ? 'EvenBetter' : 'Better';
+const SITE_DOMAIN = isEvenBetter ? 'evenbettersettlers.com' : 'bettersettlers.com';
+
 // ── Helpers ───────────────────────────────────────────────
 
 function buildConfig(mapSize: MapSize, mapType: MapType): GeneratorConfig {
@@ -119,14 +125,14 @@ function App() {
       resourceCounts[r] = (resourceCounts[r] || 0) + 1;
     }
     const text = [
-      `EvenBetterSettlers — ${mapSize} board (${mapType} distribution)`,
+      `${SITE_NAME} — ${mapSize} board (${mapType} distribution)`,
       `Resources: ${Object.entries(resourceCounts).map(([r, c]) => `${r} x${c}`).join(', ')}`,
-      `https://evenbettersettlers.com`,
+      `https://${SITE_DOMAIN}`,
     ].join('\n');
 
     try {
       if (navigator.share) {
-        await navigator.share({ title: 'EvenBetterSettlers Board', text });
+        await navigator.share({ title: `${SITE_NAME} Board`, text });
       } else {
         await navigator.clipboard.writeText(text);
         announce('Board details copied to clipboard');
@@ -173,7 +179,7 @@ function App() {
               className="text-base font-bold leading-tight"
               style={{ color: 'var(--color-text)' }}
             >
-              EvenBetterSettlers
+              {SITE_NAME}
             </h1>
             <p className="text-[11px] leading-tight" style={{ color: 'var(--color-text-muted)' }}>
               Fair boards. Better games.
@@ -287,7 +293,7 @@ function App() {
         className="text-center px-4 py-3 text-[10px] leading-relaxed"
         style={{ color: 'var(--color-text-muted)', borderTop: '1px solid var(--color-border-light)' }}
       >
-        <p>&copy; 2009&ndash;2026 EvenBetterSettlers. Not affiliated with Catan Studio or Klaus Teuber.</p>
+        <p>&copy; 2009&ndash;2026 {SITE_NAME}. Not affiliated with Catan Studio or Klaus Teuber.</p>
         <p>Originally created in 2009. Rebuilt for the modern web.</p>
       </footer>
     </div>

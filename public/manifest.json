@@ -1,6 +1,6 @@
 {
-  "name": "EvenBetterSettlers",
-  "short_name": "EvenBetter",
+  "name": "BetterSettlers",
+  "short_name": "Better",
   "description": "Fair boards. Better games. Generate balanced Settlers of Catan board layouts.",
   "start_url": "./",
   "display": "standalone",
