@@ -15,7 +15,6 @@ const AboutSection = lazy(() => import('./components/AboutSection'));
 // ── Site branding (auto-detect domain) ────────────────────
 const isEvenBetter = typeof window !== 'undefined' && window.location.hostname.includes('evenbetter');
 const SITE_NAME = isEvenBetter ? 'EvenBetterSettlers' : 'BetterSettlers';
-const SITE_SHORT = isEvenBetter ? 'EvenBetter' : 'Better';
 const SITE_DOMAIN = isEvenBetter ? 'evenbettersettlers.com' : 'bettersettlers.com';
 
 // ── Helpers ───────────────────────────────────────────────
