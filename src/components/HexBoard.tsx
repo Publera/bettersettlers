@@ -226,7 +226,7 @@ function ResourceHex({
                   <circle
                     key={i}
                     cx={startX + i * 5}
-                    cy={cy + 19}
+                    cy={cy + 24}
                     r={1.8}
                     fill={numberColor}
                   />
