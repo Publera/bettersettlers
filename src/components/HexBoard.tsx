@@ -11,7 +11,6 @@ import type { BoardState } from '../lib/board-generator';
 // Flat-top regular hexagons that tessellate with zero gaps.
 // HEX_SIZE = distance from center to any vertex.
 const HEX_SIZE = 40;
-const HEX_W = HEX_SIZE * 2;            // full width  (vertex to vertex)
 const HEX_H = Math.sqrt(3) * HEX_SIZE; // full height (flat edge to flat edge)
 
 interface HexBoardProps {
