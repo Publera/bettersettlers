@@ -8,8 +8,11 @@ import {
 import type { BoardState } from '../lib/board-generator';
 
 // ── Hex geometry ──────────────────────────────────────────
+// Flat-top regular hexagons that tessellate with zero gaps.
+// HEX_SIZE = distance from center to any vertex.
 const HEX_SIZE = 40;
-const HEX_HEIGHT = Math.sqrt(3) * HEX_SIZE;
+const HEX_W = HEX_SIZE * 2;            // full width  (vertex to vertex)
+const HEX_H = Math.sqrt(3) * HEX_SIZE; // full height (flat edge to flat edge)
 
 interface HexBoardProps {
   board: BoardState;
@@ -91,9 +94,18 @@ const HARBOR_DOT_COLOR: Record<string, string> = {
 
 // ── Geometry helpers ──────────────────────────────────────
 
+// Convert the game's offset-grid coordinates to pixel positions.
+// The grid uses even-q offset layout:
+//   • columns step by x (2 = one hex apart)
+//   • odd rows are shifted right by 1 unit in x
+// For flat-top hexes the repeat distances are:
+//   horiz: 1.5 × size   (3/4 of HEX_W)
+//   vert:  √3 × size     (HEX_H)
+// Each grid-x step of 1 equals half a hex column, so multiply by 0.75×size.
+// Each grid-y step of 1 equals one full hex row, so multiply by HEX_H.
 function gridToPixel(gridX: number, gridY: number): { px: number; py: number } {
-  const px = HEX_SIZE * gridX;
-  const py = (HEX_HEIGHT * 0.75 + 6) * gridY;
+  const px = gridX * (HEX_SIZE * 0.75);       // 0.75 * size per grid unit
+  const py = gridY * (HEX_H * 0.5);           // half-height per grid unit
   return { px, py };
 }
 
@@ -141,15 +153,15 @@ function ResourceHex({
     <g role="img" aria-label={`${label}${probability ? ` with number ${probability}` : ''}`}>
       {/* Hex background */}
       <polygon
-        points={hexPoints(cx, cy, HEX_SIZE - 1)}
+        points={hexPoints(cx, cy, HEX_SIZE)}
         fill={fill}
         stroke="var(--color-bg, #f5f0e8)"
-        strokeWidth="2.5"
+        strokeWidth="2"
       />
 
       {/* Subtle inner edge highlight */}
       <polygon
-        points={hexPoints(cx, cy, HEX_SIZE - 3.5)}
+        points={hexPoints(cx, cy, HEX_SIZE - 2.5)}
         fill="none"
         stroke={isDark ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.25)'}
         strokeWidth="0.75"
@@ -257,10 +269,10 @@ function WaterHex({
     <g role={isHarbor ? 'img' : undefined} aria-label={isHarbor ? `Harbor: ${harborLabel} trade${!is3to1 ? ` for ${RESOURCE_LABEL[harborResource] || 'any'}` : ''}` : undefined}>
       {/* Water hex */}
       <polygon
-        points={hexPoints(cx, cy, HEX_SIZE - 1)}
+        points={hexPoints(cx, cy, HEX_SIZE)}
         fill={`url(#${waterGradientId})`}
         stroke="var(--color-bg, #f5f0e8)"
-        strokeWidth="2.5"
+        strokeWidth="2"
         opacity="0.55"
       />
 
@@ -361,18 +373,18 @@ export default function HexBoard({ board, className, animationKey }: HexBoardPro
       const { px, py } = gridToPixel(board.landGrid[i].x, board.landGrid[i].y);
       landPixels.push({ px, py, idx: i });
       minX = Math.min(minX, px - HEX_SIZE);
-      minY = Math.min(minY, py - HEX_HEIGHT / 2);
+      minY = Math.min(minY, py - HEX_H / 2);
       maxX = Math.max(maxX, px + HEX_SIZE);
-      maxY = Math.max(maxY, py + HEX_HEIGHT / 2);
+      maxY = Math.max(maxY, py + HEX_H / 2);
     }
 
     for (let i = 0; i < board.waterGrid.length; i++) {
       const { px, py } = gridToPixel(board.waterGrid[i].x, board.waterGrid[i].y);
       waterPixels.push({ px, py, idx: i });
       minX = Math.min(minX, px - HEX_SIZE);
-      minY = Math.min(minY, py - HEX_HEIGHT / 2);
+      minY = Math.min(minY, py - HEX_H / 2);
       maxX = Math.max(maxX, px + HEX_SIZE);
-      maxY = Math.max(maxY, py + HEX_HEIGHT / 2);
+      maxY = Math.max(maxY, py + HEX_H / 2);
     }
 
     const padding = 12;
