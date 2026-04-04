@@ -2,33 +2,101 @@ import { useMemo } from 'react';
 import {
   Resource,
   PROBABILITY_MAPPING,
-  RESOURCE_COLORS,
   HARBOR_LABELS,
-  RESOURCE_ICONS,
   type HarborEntry,
 } from '../lib/constants';
 import type { BoardState } from '../lib/board-generator';
 
-// Hex geometry constants
-const HEX_SIZE = 40; // radius (flat-top)
+// ── Hex geometry ──────────────────────────────────────────
+const HEX_SIZE = 40;
 const HEX_HEIGHT = Math.sqrt(3) * HEX_SIZE;
 
 interface HexBoardProps {
   board: BoardState;
   className?: string;
+  animationKey?: number;
 }
 
-/** Convert grid coordinates to pixel position */
+// ── Colorblind-friendly resource palette ──────────────────
+// Designed with distinct hue, saturation, AND value to remain
+// distinguishable under all three major color-vision deficiencies.
+const RESOURCE_FILL: Record<string, string> = {
+  [Resource.SHEEP]: '#6abf69',
+  [Resource.WHEAT]: '#f2cf5b',
+  [Resource.WOOD]: '#2b7a3a',
+  [Resource.ROCK]: '#8e99a4',
+  [Resource.CLAY]: '#c06e3a',
+  [Resource.DESERT]: '#e8dcc0',
+};
+
+// Resource SVG icon paths (small, crisp inline symbols — no emoji)
+const RESOURCE_ICON: Record<string, { path: string; viewBox: string; fill: string }> = {
+  [Resource.SHEEP]: {
+    // Fluffy cloud shape representing wool
+    path: 'M12 8c-1.5 0-2.7.8-3.2 2H8c-2.2 0-4 1.8-4 4s1.8 4 4 4h8c2.2 0 4-1.8 4-4 0-1.9-1.3-3.4-3-3.9-.5-1.2-1.7-2.1-3-2.1z',
+    viewBox: '0 0 24 24',
+    fill: '#fff',
+  },
+  [Resource.WHEAT]: {
+    // Wheat stalk
+    path: 'M12 2L9 7l3 1 3-1-3-5zm0 6L9 13l3 1 3-1-3-5zm0 6l-2 4h4l-2-4z',
+    viewBox: '0 0 24 24',
+    fill: '#8B6914',
+  },
+  [Resource.WOOD]: {
+    // Tree / pine
+    path: 'M12 2L5 12h3l-2 5h4v5h4v-5h4l-2-5h3L12 2z',
+    viewBox: '0 0 24 24',
+    fill: '#c8e6c9',
+  },
+  [Resource.ROCK]: {
+    // Mountain peaks
+    path: 'M3 20h18L15 7l-3 5-3-3-6 11z',
+    viewBox: '0 0 24 24',
+    fill: '#455a64',
+  },
+  [Resource.CLAY]: {
+    // Brick shape
+    path: 'M3 6h8v4H3zm10 0h8v4h-8zM3 12h5v4H3zm7 0h4v4h-4zm6 0h5v4h-5z',
+    viewBox: '0 0 24 24',
+    fill: '#fff3e0',
+  },
+  [Resource.DESERT]: {
+    // Cactus
+    path: 'M11 4v5H9v4h2v9h2v-9h2V9h-2V4h-2z',
+    viewBox: '0 0 24 24',
+    fill: '#a1887f',
+  },
+};
+
+// Short text labels for accessibility (shown alongside icon)
+const RESOURCE_LABEL: Record<string, string> = {
+  [Resource.SHEEP]: 'Wool',
+  [Resource.WHEAT]: 'Grain',
+  [Resource.WOOD]: 'Wood',
+  [Resource.ROCK]: 'Ore',
+  [Resource.CLAY]: 'Brick',
+  [Resource.DESERT]: 'Desert',
+};
+
+// Harbor resource indicator colors
+const HARBOR_DOT_COLOR: Record<string, string> = {
+  [Resource.SHEEP]: '#6abf69',
+  [Resource.WHEAT]: '#f2cf5b',
+  [Resource.WOOD]: '#2b7a3a',
+  [Resource.ROCK]: '#8e99a4',
+  [Resource.CLAY]: '#c06e3a',
+  [Resource.DESERT]: '#e8dcc0',
+};
+
+// ── Geometry helpers ──────────────────────────────────────
+
 function gridToPixel(gridX: number, gridY: number): { px: number; py: number } {
-  // The original AS3 uses: x = xd * gridX + STARTING_X, y = ydt * gridY + STARTING_Y
-  // where xd=40, ydt = yd1+yd2 = 27+42 = 69
-  // For SVG, we use our own scaling but maintain the relative positions
   const px = HEX_SIZE * gridX;
-  const py = (HEX_HEIGHT * 0.75 + 6) * gridY; // ~69 in original proportions
+  const py = (HEX_HEIGHT * 0.75 + 6) * gridY;
   return { px, py };
 }
 
-/** Generate flat-top hexagon points */
 function hexPoints(cx: number, cy: number, size: number): string {
   const points: string[] = [];
   for (let i = 0; i < 6; i++) {
@@ -40,7 +108,6 @@ function hexPoints(cx: number, cy: number, size: number): string {
   return points.join(' ');
 }
 
-/** Get the vertex position of a hex (0-5, starting from right, going clockwise) */
 function hexVertex(cx: number, cy: number, size: number, vertex: number): { x: number; y: number } {
   const angle = (Math.PI / 180) * (60 * vertex);
   return {
@@ -48,6 +115,8 @@ function hexVertex(cx: number, cy: number, size: number, vertex: number): { x: n
     y: cy + size * Math.sin(angle),
   };
 }
+
+// ── ResourceHex component ─────────────────────────────────
 
 function ResourceHex({
   cx,
@@ -60,57 +129,80 @@ function ResourceHex({
   resource: Resource;
   probability: number | null;
 }) {
-  const color = RESOURCE_COLORS[resource];
+  const fill = RESOURCE_FILL[resource] || '#d4c5a9';
   const isHighProb = probability === 6 || probability === 8;
-  const textColor = isHighProb ? '#cc0000' : '#1a1a1a';
+  const numberColor = isHighProb ? '#cc2200' : '#2a2520';
   const dots = probability !== null ? PROBABILITY_MAPPING[probability] : 0;
-
-  // Resource label mapping
-  const resourceLabel: Record<string, string> = {
-    [Resource.SHEEP]: '🐑',
-    [Resource.WHEAT]: '🌾',
-    [Resource.WOOD]: '🌲',
-    [Resource.ROCK]: '⛰️',
-    [Resource.CLAY]: '🧱',
-    [Resource.DESERT]: '🏜️',
-  };
+  const icon = RESOURCE_ICON[resource];
+  const label = RESOURCE_LABEL[resource] || '';
+  const isDark = resource === Resource.WOOD;
 
   return (
-    <g>
-      {/* Hex shape */}
+    <g role="img" aria-label={`${label}${probability ? ` with number ${probability}` : ''}`}>
+      {/* Hex background */}
       <polygon
         points={hexPoints(cx, cy, HEX_SIZE - 1)}
-        fill={color}
-        stroke="#ffffff"
-        strokeWidth="2"
+        fill={fill}
+        stroke="var(--color-bg, #f5f0e8)"
+        strokeWidth="2.5"
+      />
+
+      {/* Subtle inner edge highlight */}
+      <polygon
+        points={hexPoints(cx, cy, HEX_SIZE - 3.5)}
+        fill="none"
+        stroke={isDark ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.25)'}
+        strokeWidth="0.75"
       />
 
       {/* Resource icon */}
+      {icon && (
+        <svg
+          x={cx - 7}
+          y={cy - (probability !== null ? 15 : 7)}
+          width="14"
+          height="14"
+          viewBox={icon.viewBox}
+        >
+          <path d={icon.path} fill={icon.fill} opacity="0.85" />
+        </svg>
+      )}
+
+      {/* Tiny resource label for accessibility */}
       <text
         x={cx}
-        y={cy - (probability !== null ? 8 : 2)}
+        y={cy - (probability !== null ? 22 : 14)}
         textAnchor="middle"
-        dominantBaseline="central"
-        fontSize="16"
+        dominantBaseline="auto"
+        fontSize="5.5"
+        fontWeight="600"
+        fill={isDark ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.45)'}
         className="select-none"
+        aria-hidden="true"
       >
-        {resourceLabel[resource] || ''}
+        {label.toUpperCase()}
       </text>
 
       {/* Number token */}
       {probability !== null && probability !== 0 && (
         <>
-          {/* Token background circle */}
-          <circle cx={cx} cy={cy + 8} r={14} fill="#f5f0e0" stroke="#c4b99a" strokeWidth="1.5" />
+          <circle
+            cx={cx}
+            cy={cy + 6}
+            r={13}
+            fill="#f8f4ea"
+            stroke="#c8c0ac"
+            strokeWidth="1.2"
+          />
           <text
             x={cx}
-            y={cy + 9}
+            y={cy + 7}
             textAnchor="middle"
             dominantBaseline="central"
-            fontSize="16"
+            fontSize={isHighProb ? '15' : '14'}
             fontWeight="bold"
-            fontFamily="'Courier New', monospace"
-            fill={textColor}
+            fontFamily="'Inter', system-ui, sans-serif"
+            fill={numberColor}
             className="select-none"
           >
             {probability}
@@ -120,15 +212,15 @@ function ResourceHex({
           {dots > 0 && (
             <g>
               {Array.from({ length: dots }, (_, i) => {
-                const totalWidth = (dots - 1) * 6;
+                const totalWidth = (dots - 1) * 5;
                 const startX = cx - totalWidth / 2;
                 return (
                   <circle
                     key={i}
-                    cx={startX + i * 6}
-                    cy={cy + 23}
-                    r={2}
-                    fill={textColor}
+                    cx={startX + i * 5}
+                    cy={cy + 19}
+                    r={1.8}
+                    fill={numberColor}
                   />
                 );
               })}
@@ -140,42 +232,65 @@ function ResourceHex({
   );
 }
 
+// ── WaterHex component ────────────────────────────────────
+
 function WaterHex({
   cx,
   cy,
   harbor,
+  waterGradientId,
 }: {
   cx: number;
   cy: number;
   harbor: HarborEntry;
+  waterGradientId: string;
 }) {
   const isHarbor = harbor[0] !== Resource.WATER;
   const harborResource = harbor[0];
-  const harborColor = isHarbor ? RESOURCE_COLORS[harborResource] : RESOURCE_COLORS[Resource.WATER];
-
-  // Harbor line directions (0-5 vertices)
   const harborArr = harbor as [Resource, ...number[]];
   const dir1 = harborArr.length > 1 ? (harborArr[1] as number) : -1;
   const dir2 = harborArr.length > 2 ? (harborArr[2] as number) : -1;
+  const harborLabel = isHarbor ? (HARBOR_LABELS[harborResource] || '?') : '';
+  const is3to1 = harborResource === Resource.DESERT;
 
   return (
-    <g>
-      {/* Water hex shape */}
+    <g role={isHarbor ? 'img' : undefined} aria-label={isHarbor ? `Harbor: ${harborLabel} trade${!is3to1 ? ` for ${RESOURCE_LABEL[harborResource] || 'any'}` : ''}` : undefined}>
+      {/* Water hex */}
       <polygon
         points={hexPoints(cx, cy, HEX_SIZE - 1)}
-        fill={RESOURCE_COLORS[Resource.WATER]}
-        stroke="#ffffff"
-        strokeWidth="2"
-        opacity="0.6"
+        fill={`url(#${waterGradientId})`}
+        stroke="var(--color-bg, #f5f0e8)"
+        strokeWidth="2.5"
+        opacity="0.55"
+      />
+
+      {/* Subtle wave pattern */}
+      <line
+        x1={cx - 14}
+        y1={cy - 2}
+        x2={cx + 14}
+        y2={cy - 2}
+        stroke="rgba(255,255,255,0.15)"
+        strokeWidth="1"
+        strokeLinecap="round"
+      />
+      <line
+        x1={cx - 10}
+        y1={cy + 5}
+        x2={cx + 10}
+        y2={cy + 5}
+        stroke="rgba(255,255,255,0.1)"
+        strokeWidth="0.8"
+        strokeLinecap="round"
       />
 
       {/* Harbor indicator */}
       {isHarbor && (
         <>
-          {/* Harbor direction lines */}
+          {/* Direction lines (dock lines) */}
           {[dir1, dir2].map((dir, i) => {
             if (dir < 0) return null;
-            const vertex = hexVertex(cx, cy, HEX_SIZE - 4, dir);
+            const vertex = hexVertex(cx, cy, HEX_SIZE - 5, dir);
             return (
               <line
                 key={i}
@@ -183,49 +298,49 @@ function WaterHex({
                 y1={cy}
                 x2={vertex.x}
                 y2={vertex.y}
-                stroke={harborResource === Resource.DESERT ? '#ffffff' : harborColor}
-                strokeWidth="3"
+                stroke="#f8f4ea"
+                strokeWidth="2.5"
                 strokeLinecap="round"
+                opacity="0.8"
               />
             );
           })}
 
-          {/* Harbor circle */}
+          {/* Harbor circle background */}
           <circle
             cx={cx}
             cy={cy}
-            r={14}
-            fill={harborResource === Resource.DESERT ? '#ffffff' : harborColor}
-            stroke="#ffffff"
-            strokeWidth="1.5"
+            r={13}
+            fill="#f8f4ea"
+            stroke="#c8c0ac"
+            strokeWidth="1.2"
           />
 
-          {/* Harbor label */}
+          {/* Trade ratio text */}
           <text
             x={cx}
-            y={cy - 1}
+            y={cy + (is3to1 ? 0.5 : -2.5)}
             textAnchor="middle"
             dominantBaseline="central"
             fontSize="10"
-            fontWeight="bold"
-            fill={harborResource === Resource.DESERT ? '#333' : '#fff'}
+            fontWeight="700"
+            fontFamily="'Inter', system-ui, sans-serif"
+            fill="#2a2520"
             className="select-none"
           >
-            {HARBOR_LABELS[harborResource] || '?'}
+            {harborLabel}
           </text>
 
-          {/* Resource icon for specific harbors */}
-          {harborResource !== Resource.DESERT && (
-            <text
-              x={cx}
-              y={cy + 10}
-              textAnchor="middle"
-              dominantBaseline="central"
-              fontSize="8"
-              className="select-none"
-            >
-              {RESOURCE_ICONS[harborResource] || ''}
-            </text>
+          {/* Resource color dot for 2:1 harbors */}
+          {!is3to1 && (
+            <circle
+              cx={cx}
+              cy={cy + 7}
+              r={3.5}
+              fill={HARBOR_DOT_COLOR[harborResource] || '#999'}
+              stroke="#c8c0ac"
+              strokeWidth="0.6"
+            />
           )}
         </>
       )}
@@ -233,8 +348,9 @@ function WaterHex({
   );
 }
 
-export default function HexBoard({ board, className }: HexBoardProps) {
-  // Calculate pixel positions for all hexes
+// ── Main board component ──────────────────────────────────
+
+export default function HexBoard({ board, className, animationKey }: HexBoardProps) {
   const { landPixels, waterPixels, viewBox } = useMemo(() => {
     const landPixels: { px: number; py: number; idx: number }[] = [];
     const waterPixels: { px: number; py: number; idx: number }[] = [];
@@ -259,29 +375,48 @@ export default function HexBoard({ board, className }: HexBoardProps) {
       maxY = Math.max(maxY, py + HEX_HEIGHT / 2);
     }
 
-    const padding = 10;
+    const padding = 12;
     const viewBox = `${minX - padding} ${minY - padding} ${maxX - minX + padding * 2} ${maxY - minY + padding * 2}`;
 
     return { landPixels, waterPixels, viewBox };
   }, [board.landGrid, board.waterGrid]);
 
+  const waterGradientId = `water-grad-${animationKey || 0}`;
+
   return (
     <svg
       viewBox={viewBox}
       className={className}
-      style={{ width: '100%', height: 'auto', maxHeight: '70vh' }}
+      role="img"
+      aria-label="Catan board layout with resources, numbers, and harbors"
+      style={{
+        width: '100%',
+        height: 'auto',
+        maxHeight: '72dvh',
+        willChange: 'transform',
+      }}
     >
-      {/* Water hexes (background) */}
+      <defs>
+        {/* Ocean gradient */}
+        <radialGradient id={waterGradientId} cx="50%" cy="40%" r="60%">
+          <stop offset="0%" stopColor="#5ba3e6" />
+          <stop offset="60%" stopColor="#3b7fd4" />
+          <stop offset="100%" stopColor="#2563a8" />
+        </radialGradient>
+      </defs>
+
+      {/* Water hexes (background layer) */}
       {waterPixels.map(({ px, py, idx }) => (
         <WaterHex
           key={`water-${idx}`}
           cx={px}
           cy={py}
           harbor={board.harborMap[idx] || [Resource.WATER]}
+          waterGradientId={waterGradientId}
         />
       ))}
 
-      {/* Land hexes (foreground) */}
+      {/* Land hexes (foreground layer) */}
       {landPixels.map(({ px, py, idx }) => (
         <ResourceHex
           key={`land-${idx}`}

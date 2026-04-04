@@ -2,12 +2,83 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BetterSettlers — Balanced Catan Board Generator</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <!-- Primary Meta -->
+    <title>EvenBetterSettlers — Fair Catan Board Generator</title>
+    <meta name="description" content="Generate balanced Settlers of Catan board layouts for fairer, more competitive games. No resource clustering, balanced probability distribution, and fair harbor placement." />
+    <meta name="keywords" content="Catan, Settlers of Catan, board generator, balanced board, fair distribution, board game tool" />
+    <meta name="author" content="EvenBetterSettlers" />
+
+    <!-- Canonical -->
+    <link rel="canonical" href="https://evenbettersettlers.com/" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://evenbettersettlers.com/" />
+    <meta property="og:title" content="EvenBetterSettlers — Fair Catan Board Generator" />
+    <meta property="og:description" content="Generate balanced Settlers of Catan board layouts for fairer, more competitive games." />
+    <meta property="og:site_name" content="EvenBetterSettlers" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="EvenBetterSettlers — Fair Catan Board Generator" />
+    <meta name="twitter:description" content="Generate balanced Settlers of Catan board layouts for fairer, more competitive games." />
+
+    <!-- Google Search Console -->
+    <meta name="google-site-verification" content="VERIFICATION_CODE" />
+
+    <!-- PWA / Mobile -->
+    <meta name="theme-color" content="#2d6a2e" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#1a1f16" media="(prefers-color-scheme: dark)" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="EvenBetter" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <link rel="manifest" href="./manifest.json" />
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "EvenBetterSettlers",
+      "url": "https://evenbettersettlers.com",
+      "description": "Generate balanced Settlers of Catan board layouts for fairer, more competitive games.",
+      "applicationCategory": "GameApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "creator": {
+        "@type": "Organization",
+        "name": "EvenBetterSettlers"
+      }
+    }
+    </script>
+
+    <!-- GA4: G-XXXXXXXXXX -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-XXXXXXXXXX');
+    </script>
   </head>
   <body>
     <div id="root"></div>

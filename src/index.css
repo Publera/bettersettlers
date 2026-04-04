@@ -1,19 +1,175 @@
 @import "tailwindcss";
 
+/* ── Design tokens ─────────────────────────────────────── */
+
 :root {
+  /* Brand palette — earthy, game-inspired */
+  --color-brand: #2d6a2e;
+  --color-brand-light: #3a8a3b;
+  --color-brand-dark: #1a4d1b;
+  --color-amber: #d4a843;
+  --color-amber-light: #f5d76e;
+  --color-ocean: #2563eb;
+  --color-ocean-light: #4a90d9;
+
+  /* Surfaces */
+  --color-bg: #f5f0e8;
+  --color-bg-elevated: #ffffff;
+  --color-bg-controls: rgba(255, 255, 255, 0.92);
+  --color-surface: #eae4d8;
+  --color-surface-hover: #dfd8ca;
+
+  /* Text */
+  --color-text: #1a1a1a;
+  --color-text-secondary: #5c5548;
+  --color-text-muted: #8a8279;
+
+  /* Borders */
+  --color-border: #d4cbbe;
+  --color-border-light: #e8e1d5;
+
+  /* Toggle pill */
+  --color-toggle-bg: #e8e1d5;
+  --color-toggle-active: #ffffff;
+  --color-toggle-text: #8a8279;
+  --color-toggle-text-active: #1a1a1a;
+
+  /* Misc */
+  --color-danger: #cc2200;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.16);
+
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-  color: #1a1a1a;
-  background-color: #f5f0e8;
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  color-scheme: light dark;
 }
+
+/* ── Dark mode ─────────────────────────────────────────── */
+
+.dark {
+  --color-bg: #1a1f16;
+  --color-bg-elevated: #242b1e;
+  --color-bg-controls: rgba(36, 43, 30, 0.95);
+  --color-surface: #2a3224;
+  --color-surface-hover: #344030;
+
+  --color-text: #e8e1d5;
+  --color-text-secondary: #b0a898;
+  --color-text-muted: #7a7268;
+
+  --color-border: #3a4532;
+  --color-border-light: #2f3a28;
+
+  --color-toggle-bg: #2a3224;
+  --color-toggle-active: #3a4a30;
+  --color-toggle-text: #7a7268;
+  --color-toggle-text-active: #e8e1d5;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.5);
+}
+
+/* ── Base styles ───────────────────────────────────────── */
 
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overscroll-behavior: none;
 }
 
 #root {
   min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* ── Board animation ───────────────────────────────────── */
+
+.board-enter {
+  animation: board-in 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes board-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ── Reduced motion ────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .board-enter {
+    animation: none;
+  }
+}
+
+/* ── Focus styles ──────────────────────────────────────── */
+
+:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ── Scrollbar (subtle) ────────────────────────────────── */
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 3px;
+}
+
+/* ── Utility ───────────────────────────────────────────── */
+
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Screen reader only */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Safe area insets for bottom controls on notched phones */
+.pb-safe {
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
 }
