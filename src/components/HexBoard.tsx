@@ -296,11 +296,13 @@ function WaterHex({
       {isHarbor && (
         <>
           {/* Direction lines (dock lines toward land hexes) */}
-          {/* Harbor vertex indices in constants are from the original flat-top layout. */}
-          {/* Our pointy-top rotation shifts vertices by +1 (mod 6). */}
+          {/* Harbor vertex indices in constants use the original Flash numbering: */}
+          {/*   0=upper-left, 1=top, 2=upper-right, 3=lower-right, 4=bottom, 5=lower-left */}
+          {/* Our pointy-top hexVertex uses: 0=top, 1=upper-right, ..., 5=upper-left */}
+          {/* Mapping: pointy_vertex = (flash_vertex + 5) % 6 */}
           {[dir1, dir2].map((dir, i) => {
             if (dir < 0) return null;
-            const mappedDir = (dir + 1) % 6;
+            const mappedDir = (dir + 5) % 6;
             const vertex = hexVertex(cx, cy, HEX_SIZE - 5, mappedDir);
             return (
               <line
