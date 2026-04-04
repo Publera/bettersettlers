@@ -295,10 +295,13 @@ function WaterHex({
       {/* Harbor indicator */}
       {isHarbor && (
         <>
-          {/* Direction lines (dock lines) */}
+          {/* Direction lines (dock lines toward land hexes) */}
+          {/* Harbor vertex indices in constants are from the original flat-top layout. */}
+          {/* Our pointy-top rotation shifts vertices by +1 (mod 6). */}
           {[dir1, dir2].map((dir, i) => {
             if (dir < 0) return null;
-            const vertex = hexVertex(cx, cy, HEX_SIZE - 5, dir);
+            const mappedDir = (dir + 1) % 6;
+            const vertex = hexVertex(cx, cy, HEX_SIZE - 5, mappedDir);
             return (
               <line
                 key={i}
