@@ -145,7 +145,7 @@ function App() {
 
   return (
     <div
-      className="min-h-screen min-h-dvh flex flex-col relative"
+      className="min-h-screen min-h-dvh lg:h-dvh lg:overflow-hidden flex flex-col relative"
       style={{ backgroundColor: 'var(--color-bg)', color: 'var(--color-text)' }}
     >
       {/* Screen reader live region */}
@@ -223,12 +223,12 @@ function App() {
             )}
           </button>
 
-          {/* Info button */}
+          {/* Info button (mobile only — desktop shows a permanent sidebar) */}
           <button
             onClick={() => setShowAbout(!showAbout)}
             aria-label={showAbout ? 'Hide algorithm info' : 'How the algorithm works'}
             aria-expanded={showAbout}
-            className="touch-target p-2 rounded-lg transition-colors"
+            className="touch-target p-2 rounded-lg transition-colors lg:hidden"
             style={{ color: 'var(--color-text-muted)' }}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -240,39 +240,57 @@ function App() {
         </div>
       </header>
 
-      {/* About section (lazy loaded) */}
+      {/* About panel (mobile overlay, lazy loaded) */}
       {showAbout && (
-        <Suspense fallback={null}>
-          <AboutSection onClose={() => setShowAbout(false)} />
-        </Suspense>
+        <div className="lg:hidden">
+          <Suspense fallback={null}>
+            <AboutSection onClose={() => setShowAbout(false)} siteName={SITE_NAME} />
+          </Suspense>
+        </div>
       )}
 
-      {/* Board area */}
-      <main
-        className="flex-1 flex items-center justify-center px-2 py-2 relative"
-        onClick={dismissTooltip}
-      >
-        <div className="w-full max-w-xl board-enter" key={animKey}>
-          <HexBoard board={board} className="w-full" animationKey={animKey} />
-        </div>
-
-        {/* Onboarding tooltip */}
-        {showTooltip && (
-          <div
-            className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2.5 rounded-xl text-xs font-medium max-w-[280px] text-center animate-pulse"
-            style={{
-              backgroundColor: 'var(--color-bg-elevated)',
-              color: 'var(--color-text-secondary)',
-              boxShadow: 'var(--shadow-lg)',
-              border: '1px solid var(--color-border-light)',
-            }}
-            role="status"
-            onClick={dismissTooltip}
-          >
-            Tap <strong>Generate</strong> for a new balanced board, or use the toggles to change size and distribution.
+      {/* Board area + desktop sidebar */}
+      <div className="flex-1 flex min-h-0">
+        <main
+          className="flex-1 flex items-center justify-center px-2 py-2 relative"
+          onClick={dismissTooltip}
+        >
+          <div className="w-full max-w-xl board-enter" key={animKey}>
+            <HexBoard board={board} className="w-full" animationKey={animKey} />
           </div>
-        )}
-      </main>
+
+          {/* Onboarding tooltip */}
+          {showTooltip && (
+            <div
+              className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2.5 rounded-xl text-xs font-medium max-w-[280px] text-center animate-pulse"
+              style={{
+                backgroundColor: 'var(--color-bg-elevated)',
+                color: 'var(--color-text-secondary)',
+                boxShadow: 'var(--shadow-lg)',
+                border: '1px solid var(--color-border-light)',
+              }}
+              role="status"
+              onClick={dismissTooltip}
+            >
+              Tap <strong>Generate</strong> for a new balanced board, or use the toggles to change size and distribution.
+            </div>
+          )}
+        </main>
+
+        {/* Permanent sidebar on desktop */}
+        <aside
+          aria-label="How the algorithm works and about"
+          className="hidden lg:block w-[340px] xl:w-[380px] shrink-0 overflow-y-auto"
+          style={{
+            backgroundColor: 'var(--color-bg-elevated)',
+            borderLeft: '1px solid var(--color-border-light)',
+          }}
+        >
+          <Suspense fallback={null}>
+            <AboutSection variant="sidebar" siteName={SITE_NAME} />
+          </Suspense>
+        </aside>
+      </div>
 
       {/* Bottom controls */}
       <nav aria-label="Board controls" className="sticky bottom-0 z-10">
