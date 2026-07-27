@@ -80,13 +80,20 @@
     }
     </script>
 
-    <!-- GA4: G-J7H5M3STW5 -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-J7H5M3STW5"></script>
+    <!-- GA4: domain-aware (BetterSettlers: G-V8B93CEVF9, EvenBetterSettlers: G-J7H5M3STW5) -->
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-J7H5M3STW5');
+      (function () {
+        var GA_ID = location.hostname.indexOf('evenbetter') !== -1 ? 'G-J7H5M3STW5' : 'G-V8B93CEVF9';
+        var s = document.createElement('script');
+        s.async = true;
+        s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
+        document.head.appendChild(s);
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        window.gtag = gtag;
+        gtag('js', new Date());
+        gtag('config', GA_ID);
+      })();
     </script>
   </head>
   <body>
