@@ -61,7 +61,7 @@ function InfoContent({ siteName }: { siteName: string }) {
       </p>
 
       <p className="text-[10px] italic" style={{ color: 'var(--color-text-muted)' }}>
-        Originally built as a Flash app in 2009. Rebuilt for the modern web.
+        Originally built in Flash in 2009 and revived for the modern web in 2026 by Perplexity Computer.
       </p>
     </>
   );
