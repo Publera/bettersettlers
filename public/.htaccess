@@ -3,9 +3,14 @@ Options -Indexes
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
-  # Redirect www to apex (HTTPS redirect added after AutoSSL is confirmed)
+  # Force HTTPS and apex domain
+  RewriteCond %{HTTPS} !=on [OR]
   RewriteCond %{HTTP_HOST} ^www\.bettersettlers\.com$ [NC]
-  RewriteRule ^(.*)$ http://bettersettlers.com/$1 [L,R=301]
+  RewriteRule ^(.*)$ https://bettersettlers.com/$1 [L,R=301]
+</IfModule>
+
+<IfModule mod_headers.c>
+  Header always set Strict-Transport-Security "max-age=31536000" env=HTTPS
 </IfModule>
 
 <IfModule mod_headers.c>
