@@ -311,7 +311,7 @@ function App() {
         style={{ color: 'var(--color-text-muted)', borderTop: '1px solid var(--color-border-light)' }}
       >
         <p>&copy; 2009&ndash;2026 {SITE_NAME}. Not affiliated with Catan Studio or Klaus Teuber.</p>
-        <p>Originally created in 2009. Rebuilt for the modern web.</p>
+        <p>Originally built in Flash in 2009 and revived for the modern web in 2026 by Perplexity Computer.</p>
       </footer>
     </div>
   );
